@@ -17,7 +17,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("not supported IN");
 
         // a16 in (11, 12)
-        helper("a16m1007s2d11s2d12o10");
+        filterBuilderFromFilterString("a16m1007s2d11s2d12o10");
     }
 
     @Test
@@ -26,7 +26,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o5");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o5");
     }
 
     @Test
@@ -35,7 +35,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o1");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o1");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o2");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o2");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o3");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o3");
     }
 
     @Test
@@ -62,7 +62,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o4");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o4");
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6c1114s19d2013-07-23 21:00:00o6");
+        filterBuilderFromFilterString("a6c1114s19d2013-07-23 21:00:00o6");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6o8");
+        filterBuilderFromFilterString("a6o8");
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column tm of type INT96 is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a6o9");
+        filterBuilderFromFilterString("a6o9");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o5");
+        filterBuilderFromFilterString("a14c23s1d0o5");
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o1");
+        filterBuilderFromFilterString("a14c23s1d0o1");
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o2");
+        filterBuilderFromFilterString("a14c23s1d0o2");
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o3");
+        filterBuilderFromFilterString("a14c23s1d0o3");
     }
 
     @Test
@@ -134,7 +134,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o4");
+        filterBuilderFromFilterString("a14c23s1d0o4");
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // dec2 = 0
-        helper("a14c23s1d0o6");
+        filterBuilderFromFilterString("a14c23s1d0o6");
     }
 
     @Test
@@ -152,7 +152,7 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a14o8");
+        filterBuilderFromFilterString("a14o8");
     }
 
     @Test
@@ -161,10 +161,10 @@ public class ParquetRecordFilterBuilderTest extends ParquetBaseTest {
         thrown.expectMessage("Column dec2 of type FIXED_LEN_BYTE_ARRAY is not supported");
 
         // tm = '2013-07-23 21:00:00'
-        helper("a14o9");
+        filterBuilderFromFilterString("a14o9");
     }
 
-    private ParquetRecordFilterBuilder helper(String filterString) throws Exception {
+    private ParquetRecordFilterBuilder filterBuilderFromFilterString(String filterString) throws Exception {
 
         ParquetRecordFilterBuilder filterBuilder = new ParquetRecordFilterBuilder(
                 columnDescriptors, originalFieldsMap);

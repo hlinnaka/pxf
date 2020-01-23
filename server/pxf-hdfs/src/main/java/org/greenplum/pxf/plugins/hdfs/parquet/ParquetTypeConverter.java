@@ -87,8 +87,7 @@ public enum ParquetTypeConverter {
             if (originalType == OriginalType.DATE) {
                 return new DateWritable(result).get(true);
             } else if (originalType == OriginalType.DECIMAL) {
-                int scale = type.asPrimitiveType().getDecimalMetadata().getScale();
-                return new BigDecimal(BigInteger.valueOf(result), scale);
+                return ParquetTypeConverter.bigDecimalFromLong(type, result);
             } else if (originalType == OriginalType.INT_8 || originalType == OriginalType.INT_16) {
                 return (short) result;
             } else {
@@ -117,8 +116,7 @@ public enum ParquetTypeConverter {
             long value = group.getLong(columnIndex, repeatIndex);
             OriginalType originalType = type.getOriginalType();
             if (originalType == OriginalType.DECIMAL) {
-                int scale = type.asPrimitiveType().getDecimalMetadata().getScale();
-                return new BigDecimal(BigInteger.valueOf(value), scale);
+                return ParquetTypeConverter.bigDecimalFromLong(type, value);
             }
             return value;
         }
@@ -272,7 +270,7 @@ public enum ParquetTypeConverter {
      * Converts a "timestamp with time zone" string to a INT96 byte array.
      * Supports microseconds for timestamps
      *
-     * @param timestampWithTimeZoneString
+     * @param timestampWithTimeZoneString the greenplum string of the timestamp with the time zone
      * @return Binary format of the timestamp with time zone string
      */
     public static Binary getBinaryFromTimestampWithTimeZone(String timestampWithTimeZoneString) {
@@ -289,5 +287,11 @@ public enum ParquetTypeConverter {
         long timeOfDayNanos = (timeMicros % MICROS_IN_DAY) * NANOS_IN_MICROS;
         LOG.debug("Converted timestamp: {} to julianDays: {}, timeOfDayNanos: {}", timestampString, julianDays, timeOfDayNanos);
         return new NanoTime(julianDays, timeOfDayNanos).toBinary();
+    }
+
+    // Helper method that returns a BigDecimal from the long value
+    private static BigDecimal bigDecimalFromLong(Type type, long value) {
+        int scale = type.asPrimitiveType().getDecimalMetadata().getScale();
+        return new BigDecimal(BigInteger.valueOf(value), scale);
     }
 }

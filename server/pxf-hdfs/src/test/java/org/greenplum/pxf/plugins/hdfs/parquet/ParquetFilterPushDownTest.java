@@ -48,6 +48,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
     private static final Double[] COL15 = {0.0, 123.45, -1.45, 0.25, -.25, 999.99, -999.99, 1.0, -1.0, 789.0, -789.0, 0.99, -0.99, 1.99, null, -1.99, 15.99, -15.99, -299.99, 299.99, 555.55, 0.15, 3.89, 3.14, 8.0};
     private static final Double[] COL16 = {0.12345, -0.12345, 12345678.90123, -12345678.90123, 99999999.0, -99999999.0, -99999999.99999, 99999999.99999, 0.0, 1.0, -1.0, 0.9, -0.9, 45.0, null, -45.0, 3.14159, -3.14159, 2.71828, -2.71828, 45.99999, -45.99999, 450.45001, 0.00001, -0.00001};
     private static final Integer[] COL17 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 11, null, 11, 12, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11};
+    private static final int[] ALL = COL1;
 
     private Accessor accessor;
     private Resolver resolver;
@@ -80,7 +81,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
     @Test
     public void testNoFilter() throws Exception {
         // all rows are expected
-        helper(COL1);
+        assertRowsReturned(ALL);
     }
 
     @Test
@@ -91,7 +92,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
             String index = String.valueOf(i);
             String filterString = String.format("a0c20s%dd%so5", index.length(), index);
             context.setFilterString(filterString);
-            helper(new int[]{i});
+            assertRowsReturned(new int[]{i});
         }
     }
 
@@ -106,7 +107,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
             String index = String.valueOf(i);
             String filterString = String.format("a0c20s%dd%so5", index.length(), index);
             context.setFilterString(filterString);
-            helper(new int[]{i});
+            assertRowsReturned(new int[]{i});
         }
     }
 
@@ -115,22 +116,22 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         int[] expectedRows = {2, 4, 6, 8, 10};
         // a5 == true
         context.setFilterString("a5c16s4dtrueo0");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a5 <> true
         expectedRows = new int[]{1, 3, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a5c16s4dtrueo6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a5 == false
-        expectedRows = new int[]{1, 3, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25,};
+        expectedRows = new int[]{1, 3, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a5c16s5dfalseo0");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a5 <> false
         expectedRows = new int[]{2, 4, 6, 8, 10, 19};
         context.setFilterString("a5c16s5dfalseo6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -138,7 +139,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         int[] expectedRows = {1, 3, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         // NOT (a5 == true)
         context.setFilterString("a5c16s4dtrueo0l2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -146,42 +147,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a16 = 11
         int[] expectedRows = {11, 12, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a16c23s2d11o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 < 11
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         context.setFilterString("a16c23s2d11o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 > 11
         expectedRows = new int[]{15};
         context.setFilterString("a16c23s2d11o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 <= 2
         expectedRows = new int[]{1, 2};
         context.setFilterString("a16c23s1d2o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 >= 11
         expectedRows = new int[]{11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a16c23s2d11o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 <> 11
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 15};
         context.setFilterString("a16c23s2d11o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 IS NULL
         expectedRows = new int[]{13};
         context.setFilterString("a16o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a16 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a16o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -189,42 +190,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a7 = 2147483655
         int[] expectedRows = {9};
         context.setFilterString("a7c20s10d2147483655o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 < 0
         expectedRows = new int[]{19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a7c23s1d0o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 > 2147483655
         expectedRows = new int[]{10, 11, 12, 13, 14, 15, 16, 17};
         context.setFilterString("a7c20s10d2147483655o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 <= -2147483643
         expectedRows = new int[]{20, 21, 22, 23, 24, 25};
         context.setFilterString("a7c23s11d-2147483643o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 >= 2147483655
         expectedRows = new int[]{9, 10, 11, 12, 13, 14, 15, 16, 17};
         context.setFilterString("a7c20s10d2147483655o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 <> -1
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a7c23s2d-1o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 IS NULL
         expectedRows = new int[]{18};
         context.setFilterString("a7o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a7 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a7o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -232,42 +233,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a10 = 8.7
         int[] expectedRows = {2};
         context.setFilterString("a10c701s3d8.7o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 < 8.7
         expectedRows = new int[]{1, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a10c701s3d8.7o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 > 8.7
         expectedRows = new int[]{3, 4, 5, 6};
         context.setFilterString("a10c701s3d8.7o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 <= 8.7
         expectedRows = new int[]{1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a10c701s3d8.7o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 >= 8.7
         expectedRows = new int[]{2, 3, 4, 5, 6};
         context.setFilterString("a10c701s3d8.7o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 <> 8.7
         expectedRows = new int[]{1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a10c701s3d8.7o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 IS NULL
         expectedRows = new int[]{17};
         context.setFilterString("a10o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a10 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a10o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -275,42 +276,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a4 = 'excellent'
         int[] expectedRows = {2, 4, 9, 14, 20, 22};
         context.setFilterString("a4c25s9dexcellento5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 < 'excellent'
         expectedRows = new int[]{6, 8, 10, 16, 18, 24};
         context.setFilterString("a4c25s9dexcellento1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 > 'excellent'
         expectedRows = new int[]{1, 3, 5, 7, 11, 13, 15, 17, 19, 21, 23, 25};
         context.setFilterString("a4c25s9dexcellento2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 <= 'excellent'
         expectedRows = new int[]{2, 4, 6, 8, 9, 10, 14, 16, 18, 20, 22, 24};
         context.setFilterString("a4c25s9dexcellento3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 >= 'excellent'
         expectedRows = new int[]{1, 2, 3, 4, 5, 7, 9, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 25};
         context.setFilterString("a4c25s9dexcellento4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 <> 'excellent'
         expectedRows = new int[]{1, 3, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 19, 21, 23, 24, 25};
         context.setFilterString("a4c25s9dexcellento6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 IS NULL
         expectedRows = new int[]{12};
         context.setFilterString("a4o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a4 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a4o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -318,42 +319,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a11 = 's_16'
         int[] expectedRows = {11, 12, 13, 14};
         context.setFilterString("a11c25s4ds_16o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 < 's_10'
         expectedRows = new int[]{};
         context.setFilterString("a11c25s4ds_10o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 > 's_168'
         expectedRows = new int[]{1, 2, 3, 4, 15, 25};
         context.setFilterString("a11c25s5ds_168o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 <= 's_10'
         expectedRows = new int[]{5};
         context.setFilterString("a11c25s4ds_10o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 >= 's_168'
         expectedRows = new int[]{1, 2, 3, 4, 15, 24, 25};
         context.setFilterString("a11c25s5ds_168o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 <> 's_16'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a11c25s4ds_16o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 IS NULL
         expectedRows = new int[]{23};
         context.setFilterString("a11o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a11 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25};
         context.setFilterString("a11o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -361,42 +362,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a12 = 'EUR'
         int[] expectedRows = {8, 12, 17, 22, 23};
         context.setFilterString("a12c1042s3dEURo5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 < 'USD'
         expectedRows = new int[]{8, 9, 11, 12, 14, 17, 20, 22, 23};
         context.setFilterString("a12c1042s3dUSDo1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 > 'EUR'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 13, 14, 15, 16, 18, 19, 20, 21, 25};
         context.setFilterString("a12c1042s3dEURo2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 <= 'EUR'
         expectedRows = new int[]{8, 12, 17, 22, 23};
         context.setFilterString("a12c1042s3dEURo3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 >= 'USD'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 10, 13, 15, 16, 18, 19, 21, 25};
         context.setFilterString("a12c1042s3dUSDo4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 <> 'USD'
         expectedRows = new int[]{8, 9, 11, 12, 14, 17, 20, 22, 23, 24};
         context.setFilterString("a12c1042s3dUSDo6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 IS NULL
         expectedRows = new int[]{24};
         context.setFilterString("a12o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a12 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 25};
         context.setFilterString("a12o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -404,42 +405,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a9 = 1000
         int[] expectedRows = {16};
         context.setFilterString("a9c23s4d1000o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 < -1000
         expectedRows = new int[]{1, 2, 3, 4, 5, 6};
         context.setFilterString("a9c23s5d-1000o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 > 31000
         expectedRows = new int[]{22, 23, 24, 25};
         context.setFilterString("a9c23s5d31000o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 <= 0
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
         context.setFilterString("a9c23s1d0o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 >= 0
         expectedRows = new int[]{13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25};
         context.setFilterString("a9c23s1d0o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 <> 0
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a9c23s1d0o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 IS NULL
         expectedRows = new int[]{21};
         context.setFilterString("a9o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a9 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25};
         context.setFilterString("a9o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -447,42 +448,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a2 = '2019-12-04'
         int[] expectedRows = {4};
         context.setFilterString("a2c1082s10d2019-12-04o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 < '2019-12-04'
         expectedRows = new int[]{1, 2, 3};
         context.setFilterString("a2c1082s10d2019-12-04o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 > '2019-12-20'
         expectedRows = new int[]{21, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-20o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 <= '2019-12-06'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6};
         context.setFilterString("a2c1082s10d2019-12-06o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 >= '2019-12-15'
         expectedRows = new int[]{15, 16, 17, 18, 19, 20, 21, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-15o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 <> '2019-12-15'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-15o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 IS NULL
         expectedRows = new int[]{22};
         context.setFilterString("a2o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a2 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25};
         context.setFilterString("a2o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -490,42 +491,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a3 = 1200
         int[] expectedRows = {1};
         context.setFilterString("a3c701s4d1200o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 < 1500
         expectedRows = new int[]{1, 2, 3};
         context.setFilterString("a3c701s4d1500o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 > 2500
         expectedRows = new int[]{16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a3c701s4d2500o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 <= 1500
         expectedRows = new int[]{1, 2, 3, 4};
         context.setFilterString("a3c701s4d1500o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 >= 2550
         expectedRows = new int[]{16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a3c701s4d2550o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 <> 1200
         expectedRows = new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a3c701s4d1200o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 IS NULL
         expectedRows = new int[]{14};
         context.setFilterString("a3o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // a3 IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
         context.setFilterString("a3o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -533,42 +534,42 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // bin = '1'
         int[] expectedRows = {1, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         context.setFilterString("a8c25s1d1o5");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin < '1'
         expectedRows = new int[]{10};
         context.setFilterString("a8c25s1d1o1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin > '1'
         expectedRows = new int[]{2, 3, 4, 5, 6, 7, 8, 9};
         context.setFilterString("a8c25s1d1o2");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin <= '1'
         expectedRows = new int[]{1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         context.setFilterString("a8c25s1d1o3");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin >= '1'
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         context.setFilterString("a8c25s1d1o4");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin <> '1'
         expectedRows = new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10, 25};
         context.setFilterString("a8c25s1d1o6");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin IS NULL
         expectedRows = new int[]{25};
         context.setFilterString("a8o8");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
 
         // bin IS NOT NULL
         expectedRows = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         context.setFilterString("a8o9");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -576,7 +577,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // cdate > '2019-12-02' and cdate < '2019-12-12' and amt > 1500
         int[] expectedRows = {5, 6, 7, 8, 9, 10, 11};
         context.setFilterString("a2c1082s10d2019-12-02o2a2c1082s10d2019-12-12o1a3c701s4d1500o2l0l0");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -584,7 +585,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // cdate > '2019-12-19' OR ( cdate <= '2019-12-15' and amt > 2000)
         int[] expectedRows = {10, 11, 12, 13, 15, 20, 21, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-19o2a2c1082s10d2019-12-15o3a3c701s4d2000o2l0l1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -600,7 +601,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // cdate > '2019-12-19' OR ( cdate <= '2019-12-15' and amt > 2000)
         int[] expectedRows = {10, 11, 12, 13, 15, 20, 21, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-19o2a2c1082s10d2019-12-15o3a3c701s4d2000o2l0l1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -608,7 +609,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // cdate > '2019-12-20' OR amt < 1500
         int[] expectedRows = {1, 2, 3, 21, 23, 24, 25};
         context.setFilterString("a2c1082s10d2019-12-20o2a3c701s4d1500o1l1");
-        helper(expectedRows);
+        assertRowsReturned(expectedRows);
     }
 
     @Test
@@ -616,7 +617,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // tm = '2013-07-23 21:00:00'
         context.setFilterString("a6c1114s19d2013-07-23 21:00:00o5");
         // all rows are expected
-        helper(COL1);
+        assertRowsReturned(ALL);
     }
 
     @Test
@@ -624,7 +625,7 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // dec2 = 0
         context.setFilterString("a14c23s1d0o5");
         // all rows are expected
-        helper(COL1);
+        assertRowsReturned(ALL);
     }
 
     @Test
@@ -632,10 +633,10 @@ public class ParquetFilterPushDownTest extends ParquetBaseTest {
         // a16 in (11, 12)
         context.setFilterString("a16m1007s2d11s2d12o10");
         // all rows are expected
-        helper(COL1);
+        assertRowsReturned(ALL);
     }
 
-    private void helper(int[] expectedRows) throws Exception {
+    private void assertRowsReturned(int[] expectedRows) throws Exception {
         assertTrue(accessor.openForRead());
 
         OneRow oneRow;

@@ -144,7 +144,8 @@ public class ParquetFileAccessor extends BasePlugin implements Accessor {
         MessageType originalSchema = getSchema(file, fileSplit);
         // Get a map of the column name to Types for the given schema
         Map<String, Type> originalFieldsMap = getOriginalFieldsMap(originalSchema);
-        // Get the read schema in case of column projection
+        // Get the read schema. This is either the full set or a subset (in
+        // case of column projection) of the greenplum schema.
         MessageType readSchema = buildReadSchema(originalFieldsMap, originalSchema);
         // Get the record filter in case of predicate push-down
         FilterCompat.Filter recordFilter = getRecordFilter(context.getFilterString(), originalFieldsMap, readSchema);
