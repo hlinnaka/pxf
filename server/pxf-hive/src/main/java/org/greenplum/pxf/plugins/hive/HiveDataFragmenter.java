@@ -144,7 +144,7 @@ public class HiveDataFragmenter extends HdfsDataFragmenter {
             throws Exception {
         Class<?> c = Class.forName(inputFormatName, true,
                 JavaUtils.getClassLoader());
-        InputFormat<?, ?> inputFormat = (InputFormat<?, ?>) c.newInstance();
+        InputFormat<?, ?> inputFormat = (InputFormat<?, ?>) c.getDeclaredConstructor().newInstance();
 
         if ("org.apache.hadoop.mapred.TextInputFormat".equals(inputFormatName)) {
             // TextInputFormat needs a special configuration

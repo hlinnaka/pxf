@@ -219,7 +219,7 @@ public class HiveColumnarSerdeResolver extends HiveResolver {
                     builder.append(((TimestampObjectInspector) oi).getPrimitiveJavaObject(o));
                     break;
                 case BYTE:  /* TINYINT */
-                    builder.append(new Short(((ByteObjectInspector) oi).get(o)));
+                    builder.append(Short.valueOf(((ByteObjectInspector) oi).get(o)));
                     break;
                 default:
                     throw new UnsupportedTypeException(oi.getTypeName()

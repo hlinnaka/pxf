@@ -173,7 +173,7 @@ public class HiveResolver extends HivePlugin implements Resolver {
         Properties serdeProperties;
 
         Class<?> c = Class.forName(serdeClassName, true, JavaUtils.getClassLoader());
-        deserializer = (Deserializer) c.newInstance();
+        deserializer = (Deserializer) c.getDeclaredConstructor().newInstance();
         serdeProperties = new Properties();
         if (propsString != null) {
             ByteArrayInputStream inStream = new ByteArrayInputStream(propsString.getBytes());
@@ -533,7 +533,7 @@ public class HiveResolver extends HivePlugin implements Resolver {
                 if (o == null) {
                     val = null;
                 } else if (o.getClass().getSimpleName().equals("ByteWritable")) {
-                    val = new Short(((ByteWritable) o).get());
+                    val = Short.valueOf(((ByteWritable) o).get());
                 } else {
                     val = ((ShortObjectInspector) oi).get(o);
                 }
@@ -614,7 +614,7 @@ public class HiveResolver extends HivePlugin implements Resolver {
                 addOneFieldToRecord(record, DataType.DATE, val);
                 break;
             case BYTE: { /* TINYINT */
-                val = (o != null) ? new Short(((ByteObjectInspector) oi).get(o))
+                val = (o != null) ? Short.valueOf(((ByteObjectInspector) oi).get(o))
                         : null;
                 addOneFieldToRecord(record, DataType.SMALLINT, val);
                 break;

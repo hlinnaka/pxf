@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -219,14 +220,15 @@ public class HttpRequestParser implements RequestParser<HttpHeaders> {
         if (StringUtils.isNotBlank(profile)) {
             String handlerClassName = pluginConf.getHandler(profile);
             if (StringUtils.isNotBlank(handlerClassName)) {
-                Class clazz;
+                Class<?> clazz;
                 try {
                     clazz = Class.forName(handlerClassName);
-                    ProtocolHandler handler = (ProtocolHandler) clazz.newInstance();
+                    ProtocolHandler handler = (ProtocolHandler) clazz.getDeclaredConstructor().newInstance();
                     context.setFragmenter(handler.getFragmenterClassName(context));
                     context.setAccessor(handler.getAccessorClassName(context));
                     context.setResolver(handler.getResolverClassName(context));
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+			 InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(String.format("Error when invoking handlerClass '%s' : %s", handlerClassName, e), e);
                 }
             }
